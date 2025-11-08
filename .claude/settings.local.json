@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ssh-keygen:*)",
+      "Bash(system_profiler:*)",
+      "WebSearch",
+      "Bash(sqlite3:*)",
+      "Bash(sudo sqlite3:*)",
+      "Bash(systemextensionsctl list:*)",
+      "Bash(killall:*)",
+      "Bash(pytest:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
