@@ -1,0 +1,101 @@
+"""Database configuration and session management"""
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from contextlib import contextmanager, asynccontextmanager
+from typing import Generator, AsyncGenerator
+
+from src.config import settings
+from src.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
+# Sync Engine
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+    echo=settings.environment == "development",
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Async Engine for FastAPI
+async_database_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
+async_engine = create_async_engine(
+    async_database_url,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+    echo=settings.environment == "development",
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+# Sync dependency
+@contextmanager
+def get_db() -> Generator[Session, None, None]:
+    """
+    Get database session (sync)
+
+    Usage:
+        with get_db() as db:
+            # Use db
+            pass
+    """
+    db = SessionLocal()
+    try:
+        yield db
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
+# Async dependency for FastAPI
+async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Get async database session for FastAPI
+
+    Usage:
+        @app.get("/items")
+        async def read_items(db: AsyncSession = Depends(get_async_db)):
+            # Use db
+            pass
+    """
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+
+def init_db():
+    """Initialize database (create all tables)"""
+    from src.models import Base
+
+    logger.info("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
+
+
+async def init_db_async():
+    """Initialize database asynchronously"""
+    from src.models import Base
+
+    logger.info("Creating database tables (async)...")
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables created successfully")
