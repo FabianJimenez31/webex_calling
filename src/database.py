@@ -10,24 +10,34 @@ from src.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
+# Use SQLite for development if PostgreSQL is not available
+import os
+
+# Determine database URL
+if settings.environment == "development":
+    # Use SQLite for development
+    sqlite_path = os.path.join(os.getcwd(), "webex_calling.db")
+    database_url = f"sqlite:///{sqlite_path}"
+    async_database_url = f"sqlite+aiosqlite:///{sqlite_path}"
+    logger.info(f"Using SQLite database: {sqlite_path}")
+else:
+    # Use PostgreSQL for production
+    database_url = settings.database_url
+    async_database_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
+
 # Sync Engine
 engine = create_engine(
-    settings.database_url,
+    database_url,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
     echo=settings.environment == "development",
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Async Engine for FastAPI
-async_database_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
 async_engine = create_async_engine(
     async_database_url,
     pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
     echo=settings.environment == "development",
 )
 
@@ -92,10 +102,14 @@ def init_db():
 
 
 async def init_db_async():
-    """Initialize database asynchronously"""
-    from src.models import Base
+    """Initialize database asynchronously (non-blocking if DB unavailable)"""
+    try:
+        from src.models import Base
 
-    logger.info("Creating database tables (async)...")
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database tables created successfully")
+        logger.info("Creating database tables (async)...")
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.warning(f"Database initialization failed (will continue without DB): {e}")
+        logger.warning("The API will start but database-dependent endpoints may not work")

@@ -1,8 +1,7 @@
 """Alert models for security anomalies"""
 import enum
 from datetime import datetime
-from sqlalchemy import Column, String, Enum, Text, Boolean, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, String, Enum, Text, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 import uuid
 
@@ -37,8 +36,8 @@ class Alert(Base, TimestampMixin):
 
     __tablename__ = "alerts"
 
-    # Primary Key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Primary Key - Use String for SQLite compatibility
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     # Alert Classification
     alert_type = Column(Enum(AlertType), nullable=False, index=True)
@@ -55,7 +54,7 @@ class Alert(Base, TimestampMixin):
     description = Column(Text)
 
     # Detection Metrics
-    detection_data = Column(JSONB)  # Stores ML/rule outputs
+    detection_data = Column(JSON)  # Stores ML/rule outputs
 
     # Claude AI Analysis
     ai_analysis = Column(Text)  # Natural language explanation from Claude
@@ -76,11 +75,11 @@ class Alert(Base, TimestampMixin):
 
     # Notifications
     notification_sent = Column(Boolean, default=False)
-    notification_channels = Column(JSONB)  # ["email", "slack", "webex"]
+    notification_channels = Column(JSON)  # ["email", "slack", "webex"]
 
     # Related Data
-    related_call_ids = Column(JSONB)  # Array of call_ids that triggered alert
-    related_journey_ids = Column(JSONB)
+    related_call_ids = Column(JSON)  # Array of call_ids that triggered alert
+    related_journey_ids = Column(JSON)
 
     def __repr__(self):
         return f"<Alert {self.alert_type.value} - {self.severity.value} - {self.user_name}>"

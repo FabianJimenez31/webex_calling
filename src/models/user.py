@@ -1,6 +1,5 @@
 """User model for tracking users and their calling patterns"""
-from sqlalchemy import Column, String, Integer, Float, Boolean
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy import Column, String, Integer, Float, Boolean, JSON
 import uuid
 
 from .base import Base, TimestampMixin
@@ -13,8 +12,8 @@ class User(Base, TimestampMixin):
 
     __tablename__ = "users"
 
-    # Primary Key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Primary Key - Use String for SQLite compatibility
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     # User Identifiers
     user_id = Column(String(255), unique=True, nullable=False, index=True)
@@ -43,7 +42,7 @@ class User(Base, TimestampMixin):
     last_anomaly_date = Column(String(50))
 
     # Baseline Patterns (for ML)
-    baseline_data = Column(JSONB)  # Stores normal behavior patterns
+    baseline_data = Column(JSON)  # Stores normal behavior patterns
 
     def __repr__(self):
         return f"<User {self.user_name} ({self.extension})>"

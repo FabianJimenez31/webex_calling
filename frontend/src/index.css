@@ -1,0 +1,256 @@
+/* Import Davivienda-like fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Davivienda Portal Color System (Real colors from website) */
+    --background: 0 0% 100%; /* #FFFFFF - White main background */
+    --foreground: 0 0% 0.4%; /* #010101 - Binary Black for text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0.4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0.4%;
+
+    --primary: 357 97% 45%; /* #E30519 - Shojo's Blood (navigation, buttons, CTA) */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96%; /* #F5F5F5 - Light gray for sections */
+    --secondary-foreground: 0 0% 0.4%;
+
+    --muted: 0 0% 96%; /* #F5F5F5 - Light gray backgrounds */
+    --muted-foreground: 0 0% 45%; /* #737373 - Medium gray text */
+
+    --accent: 357 97% 45%; /* #E30519 - Use red as accent (no yellow in UI) */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%; /* #EF4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%; /* #E5E5E5 - Light gray borders */
+    --input: 0 0% 96%; /* #F5F5F5 - Light gray inputs */
+    --ring: 357 97% 45%; /* #E30519 - Red focus ring */
+
+    --radius: 0.5rem; /* 8px */
+
+    /* Davivienda Specific Variables (Portal colors) */
+    --davivienda-red: 357 97% 45%; /* #E30519 - Shojo's Blood (primary) */
+    --davivienda-red-hover: 357 97% 39%; /* #C70416 - Hover state */
+    --davivienda-red-active: 357 97% 33%; /* #A80313 - Active state */
+    --davivienda-gold: 35 100% 48%; /* #F39800 - Kin Gold (logo only) */
+    --davivienda-yellow: 51 100% 50%; /* #FEE000 - Tibetan Yellow (logo only) */
+    --davivienda-black: 0 0% 0.4%; /* #010101 - Binary Black */
+    --davivienda-gray-light: 0 0% 96%; /* #F5F5F5 - Light gray sections */
+
+    /* Spacing */
+    --spacing-xs: 0.25rem; /* 4px */
+    --spacing-sm: 0.5rem; /* 8px */
+    --spacing-md: 1rem; /* 16px */
+    --spacing-lg: 1.5rem; /* 24px */
+    --spacing-xl: 2rem; /* 32px */
+    --spacing-2xl: 3rem; /* 48px */
+    --spacing-3xl: 4rem; /* 64px */
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 0 0% 0.4%; /* #010101 - Binary Black */
+    --foreground: 0 0% 98%; /* #FAFAFA - White text */
+
+    --card: 0 0% 15%; /* #262626 - Dark card */
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 0.4%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 357 97% 45%; /* #E30519 - Shojo's Blood */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 15%; /* #262626 - Dark gray sections */
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%; /* #262626 */
+    --muted-foreground: 0 0% 65%; /* #9CA3AF */
+
+    --accent: 357 97% 45%; /* #E30519 - Red accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 25%; /* #404040 - Dark borders */
+    --input: 0 0% 15%;
+    --ring: 357 97% 45%; /* #E30519 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Davivienda', 'Manrope', sans-serif;
+  }
+
+  /* Typography defaults */
+  h1 {
+    @apply text-h1;
+  }
+  h2 {
+    @apply text-h2;
+  }
+  h3 {
+    @apply text-h3;
+  }
+  h4 {
+    @apply text-h4;
+  }
+  h5 {
+    @apply text-h5;
+  }
+  h6 {
+    @apply text-h6;
+  }
+}
+
+@layer components {
+  /* Davivienda Buttons */
+  .btn-davivienda-primary {
+    @apply bg-davivienda-red-500 text-white font-medium px-6 py-3 rounded-lg;
+    @apply hover:bg-davivienda-red-600 active:bg-davivienda-red-700;
+    @apply transition-all duration-200;
+    @apply shadow-davivienda hover:shadow-davivienda-lg;
+  }
+
+  .btn-davivienda-secondary {
+    @apply bg-transparent text-davivienda-red-500 font-medium px-6 py-3 rounded-lg;
+    @apply border-2 border-davivienda-red-500;
+    @apply hover:bg-davivienda-red-50 active:bg-davivienda-red-100;
+    @apply transition-all duration-200;
+  }
+
+  .btn-davivienda-ghost {
+    @apply bg-transparent text-foreground font-medium px-6 py-3 rounded-lg;
+    @apply hover:bg-muted active:bg-muted;
+    @apply transition-all duration-200;
+  }
+
+  .btn-davivienda-orange {
+    @apply bg-davivienda-orange-500 text-white font-medium px-6 py-3 rounded-lg;
+    @apply hover:bg-davivienda-orange-600 active:bg-davivienda-orange-700;
+    @apply transition-all duration-200;
+    @apply shadow-md hover:shadow-lg;
+  }
+
+  /* Davivienda Cards */
+  .card-davivienda {
+    @apply bg-card border border-border rounded-xl p-6;
+    @apply shadow-sm hover:shadow-md;
+    @apply transition-all duration-300;
+    @apply hover:-translate-y-1;
+  }
+
+  /* Davivienda Inputs */
+  .input-davivienda {
+    @apply bg-background border border-input rounded-lg px-4 py-3;
+    @apply text-foreground placeholder:text-muted-foreground;
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary;
+    @apply transition-all duration-200;
+  }
+
+  /* Davivienda Gradient CTA - Red gradient (no orange in portal) */
+  .gradient-davivienda {
+    @apply bg-gradient-to-br from-davivienda-red-500 via-davivienda-red-600 to-davivienda-red-700;
+    @apply text-white rounded-2xl p-8;
+  }
+
+  /* Davivienda Header */
+  .header-davivienda {
+    @apply bg-background border-b border-border;
+    @apply shadow-sm;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-all duration-300;
+    @apply hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* Link styles */
+  .link-davivienda {
+    @apply text-davivienda-red-500 hover:text-davivienda-red-600;
+    @apply transition-colors duration-200;
+    @apply underline-offset-4 hover:underline;
+  }
+
+  /* Badge styles - Using red (no yellow in portal UI) */
+  .badge-davivienda {
+    @apply inline-flex items-center px-3 py-1 rounded-full;
+    @apply bg-davivienda-red-50 text-davivienda-red-700;
+    @apply text-sm font-medium;
+  }
+}
+
+@layer utilities {
+  /* Custom spacing utilities */
+  .spacing-xs {
+    @apply gap-xs;
+  }
+  .spacing-sm {
+    @apply gap-sm;
+  }
+  .spacing-md {
+    @apply gap-md;
+  }
+  .spacing-lg {
+    @apply gap-lg;
+  }
+  .spacing-xl {
+    @apply gap-xl;
+  }
+  .spacing-2xl {
+    @apply gap-2xl;
+  }
+  .spacing-3xl {
+    @apply gap-3xl;
+  }
+
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Scrollbar styling (Davivienda theme) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--davivienda-red));
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--davivienda-red-hover));
+}
+
+/* Selection styling */
+::selection {
+  background: hsl(var(--davivienda-red) / 0.3);
+  color: hsl(var(--foreground));
+}

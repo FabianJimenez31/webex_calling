@@ -22,14 +22,26 @@ MODELS_DIR = DATA_DIR / "models"
 class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
 
-    # Webex Configuration
-    webex_access_token: str
-    webex_org_id: str
-    webex_bot_token: str = ""
-    webex_bot_email: str = ""
+    # Webex OAuth Configuration
+    webex_client_id: str
+    webex_client_secret: str
+    webex_redirect_uri: str
+    webex_scopes: str
+    webex_base_url: str = "https://webexapis.com/v1"
+    webex_auth_url: str = "https://webexapis.com/v1/authorize"
+    webex_token_url: str = "https://webexapis.com/v1/access_token"
+
+    # Optional: Pre-configured tokens (for development)
+    webex_access_token: str = ""
+    webex_refresh_token: str = ""
+    webex_org_id: str = ""
 
     # Claude AI Configuration
-    anthropic_api_key: str
+    anthropic_api_key: str = ""
+
+    # OpenRouter AI Configuration
+    openrouter_api_key: str
+    openrouter_model: str = "openai/gpt-oss-safeguard-20b"
 
     # Database Configuration
     db_host: str = "localhost"

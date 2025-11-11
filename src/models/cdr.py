@@ -13,8 +13,8 @@ from sqlalchemy import (
     Text,
     Index,
     ForeignKey,
+    JSON,
 )
-from sqlalchemy.dialects.postgresql import UUID, JSONB, ARRAY
 from sqlalchemy.orm import relationship
 import uuid
 
@@ -29,8 +29,8 @@ class CallDetailRecord(Base, TimestampMixin):
 
     __tablename__ = "call_detail_records"
 
-    # Primary Key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Primary Key - Use String for SQLite compatibility
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     # Call Identifiers
     call_id = Column(String(255), unique=True, nullable=False, index=True)
@@ -51,6 +51,7 @@ class CallDetailRecord(Base, TimestampMixin):
     calling_user_id = Column(String(255), index=True)
     calling_user_name = Column(String(255))
     calling_user_type = Column(String(50))
+    user = Column(String(255))  # User/Agent name (generic field)
 
     # Called Party
     called_line_id = Column(String(100))
@@ -71,6 +72,7 @@ class CallDetailRecord(Base, TimestampMixin):
     # Location
     location = Column(String(255), index=True)
     site_uuid = Column(String(255))
+    site_name = Column(String(255))  # Site/Location name
     site_timezone = Column(String(50))
 
     # Device & Client
@@ -109,8 +111,9 @@ class CallDetailRecord(Base, TimestampMixin):
     # International Dialing
     international_country = Column(String(3))  # ISO country code
 
-    # Additional metadata (flexible JSONB field)
-    metadata = Column(JSONB)
+    # Additional metadata (flexible JSON field)
+    additional_metadata = Column(JSON)
+    raw_data = Column(JSON)  # Complete raw CDR data from Webex API
 
     # Indexes
     __table_args__ = (
@@ -132,8 +135,8 @@ class CallJourney(Base, TimestampMixin):
 
     __tablename__ = "call_journeys"
 
-    # Primary Key
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Primary Key - Use String for SQLite compatibility
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     # Journey Identifier (groups multiple legs)
     journey_id = Column(String(255), unique=True, nullable=False, index=True)
@@ -149,7 +152,7 @@ class CallJourney(Base, TimestampMixin):
 
     # Route (serialized as array or text)
     route = Column(Text)  # e.g., "SIP-Bogotá → AA-Principal → Cola-Comercial → Ext.203"
-    route_stages = Column(JSONB)  # Detailed stages array
+    route_stages = Column(JSON)  # Detailed stages array
 
     # Time spent in each stage
     t_trunk_to_aa = Column(Integer)  # seconds
@@ -178,7 +181,7 @@ class CallJourney(Base, TimestampMixin):
     location = Column(String(255), index=True)
 
     # Reference to CDRs
-    cdr_ids = Column(ARRAY(String))  # Array of CDR call_ids that form this journey
+    cdr_ids = Column(JSON)  # Array of CDR call_ids that form this journey (stored as JSON for SQLite compatibility)
 
     # Indexes
     __table_args__ = (

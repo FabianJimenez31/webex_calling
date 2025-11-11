@@ -29,9 +29,8 @@ numpy==1.26.2
 scikit-learn==1.3.2
 prophet==1.1.5
 
-# Claude Agent SDK
+# Claude AI
 anthropic==0.39.0
-claude-agent-sdk==0.0.25
 
 # Visualization
 plotly==5.18.0

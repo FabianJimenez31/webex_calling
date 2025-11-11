@@ -1,27 +1,39 @@
 """Alert endpoints"""
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_
 from uuid import UUID
+from pydantic import BaseModel
 
 from src.database import get_async_db
 from src.models.alert import Alert, AlertType, AlertSeverity
 from src.api.schemas import AlertResponse, AlertList, AlertCreate, AlertUpdate
 from src.utils.logger import setup_logger
+from src.services.alert_service import alert_service
 
 logger = setup_logger(__name__)
 
 router = APIRouter()
 
 
+class WebhookConfig(BaseModel):
+    """Webhook configuration"""
+    webhook_urls: List[str]
+
+
+class EmailConfig(BaseModel):
+    """Email configuration"""
+    email_recipients: List[str]
+
+
 @router.get("/", response_model=AlertList)
 async def list_alerts(
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=100),
-    severity: str | None = None,
-    status: str | None = None,
-    user_id: str | None = None,
+    severity: Optional[str] = None,
+    status: Optional[str] = None,
+    user_id: Optional[str] = None,
     db: AsyncSession = Depends(get_async_db),
 ):
     """
@@ -211,4 +223,86 @@ async def get_alert_stats(
         "open_alerts": open_count,
         "critical_alerts": critical_count,
         "by_type": by_type,
+    }
+
+
+# Alert Service Configuration Endpoints
+
+@router.post("/config/webhooks")
+async def configure_webhooks(config: WebhookConfig):
+    """
+    Configure webhook URLs for alert notifications
+
+    Supports Slack and Microsoft Teams webhooks.
+
+    Args:
+        config: Webhook configuration with list of URLs
+
+    Returns:
+        Configuration status
+    """
+    alert_service.configure_webhooks(config.webhook_urls)
+
+    return {
+        "status": "success",
+        "message": f"Configured {len(config.webhook_urls)} webhook(s)",
+        "webhooks": config.webhook_urls
+    }
+
+
+@router.post("/config/emails")
+async def configure_emails(config: EmailConfig):
+    """
+    Configure email recipients for alert notifications
+
+    Args:
+        config: Email configuration with list of recipients
+
+    Returns:
+        Configuration status
+    """
+    alert_service.configure_emails(config.email_recipients)
+
+    return {
+        "status": "success",
+        "message": f"Configured {len(config.email_recipients)} email recipient(s)",
+        "recipients": config.email_recipients
+    }
+
+
+@router.get("/config/status")
+async def get_alert_config_status():
+    """
+    Get current alert configuration status
+
+    Returns:
+        Current webhook and email configuration
+    """
+    return {
+        "webhooks_configured": len(alert_service.webhook_urls),
+        "email_recipients_configured": len(alert_service.email_recipients),
+        "alert_history_count": len(alert_service.alert_history)
+    }
+
+
+@router.get("/history")
+async def get_alert_history(
+    limit: int = Query(50, ge=1, le=200, description="Number of alerts to return")
+):
+    """
+    Get recent alert history from the alert service
+
+    This shows alerts that were actually sent (MEDIUM or higher severity).
+
+    Args:
+        limit: Maximum number of alerts to return
+
+    Returns:
+        List of recent alerts
+    """
+    history = alert_service.get_alert_history(limit=limit)
+
+    return {
+        "total": len(history),
+        "alerts": history
     }

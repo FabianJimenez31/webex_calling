@@ -10,6 +10,7 @@ import uvicorn
 from src.config import settings
 from src.database import init_db_async
 from src.utils.logger import setup_logger
+from src.services.scheduler import analysis_scheduler
 
 # Import routers (will create these)
 # from src.api.routes import cdr, alerts, users, detection
@@ -27,10 +28,19 @@ async def lifespan(app: FastAPI):
     # Initialize database
     await init_db_async()
 
+    # Start scheduler (optional - only starts if jobs are configured)
+    # analysis_scheduler.start()  # Uncomment to auto-start scheduler
+    logger.info("Scheduler ready (use /api/v1/detection/schedule/enable to configure)")
+
     yield
 
     # Shutdown
     logger.info("Shutting down Webex Calling Security AI API...")
+
+    # Stop scheduler if running
+    if analysis_scheduler.is_running:
+        analysis_scheduler.stop()
+        logger.info("Scheduler stopped")
 
 
 # Create FastAPI app
@@ -74,12 +84,16 @@ async def health_check():
 
 
 # Include routers
-from src.api.routes import alerts
+from src.api.routes import alerts, auth, cdrs, analytics, detection, chat, reports
 
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(cdrs.router, prefix="/api/v1/cdrs", tags=["CDRs"])
 app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["Alerts"])
-# app.include_router(cdr.router, prefix="/api/v1/cdr", tags=["CDR"])
+app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+app.include_router(detection.router, prefix="/api/v1/detection", tags=["Detection"])
+app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat Assistant"])
+app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
 # app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
-# app.include_router(detection.router, prefix="/api/v1/detection", tags=["Detection"])
 
 
 # Exception handlers
