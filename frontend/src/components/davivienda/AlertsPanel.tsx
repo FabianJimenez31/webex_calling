@@ -33,7 +33,7 @@ export function AlertsPanel() {
 
   const loadConfig = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/alerts/config/status');
+      const response = await fetch('/api/v1/alerts/config/status');
       const data = await response.json();
       setConfig(data);
     } catch (error) {
@@ -43,7 +43,7 @@ export function AlertsPanel() {
 
   const loadHistory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/alerts/history?limit=20');
+      const response = await fetch('/api/v1/alerts/history?limit=20');
       const data = await response.json();
       setHistory(data.alerts);
       setShowHistory(true);
@@ -57,7 +57,7 @@ export function AlertsPanel() {
     try {
       const urls = webhookUrls.split('\n').filter(url => url.trim());
 
-      const response = await fetch('http://localhost:8000/api/v1/alerts/config/webhooks', {
+      const response = await fetch('/api/v1/alerts/config/webhooks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export function AlertsPanel() {
     try {
       const emails = emailRecipients.split('\n').filter(email => email.trim());
 
-      const response = await fetch('http://localhost:8000/api/v1/alerts/config/emails', {
+      const response = await fetch('/api/v1/alerts/config/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

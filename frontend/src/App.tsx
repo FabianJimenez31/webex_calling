@@ -164,7 +164,7 @@ function App() {
                 Sistema Operacional
               </span>
               <span>•</span>
-              <span>Powered by OpenRouter AI</span>
+              <span>Powered by ITS Infocom IA Division</span>
             </div>
           </div>
         </div>

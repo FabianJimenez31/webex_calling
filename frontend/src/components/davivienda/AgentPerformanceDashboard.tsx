@@ -54,7 +54,7 @@ export function AgentPerformanceDashboard() {
   const loadPerformanceData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/analytics/agents/performance?hours=${hours}&limit=1000`);
+      const response = await fetch(`/api/v1/analytics/agents/performance?hours=${hours}&limit=1000`);
       const data = await response.json();
       setPerformanceData(data);
     } catch (error) {

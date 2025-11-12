@@ -37,9 +37,9 @@ export function DashboardOverview() {
     try {
       // Load stats from multiple endpoints
       const [alertsConfig, schedulerStatus, detectionStats] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/alerts/config/status').then(r => r.json()),
-        fetch('http://localhost:8000/api/v1/detection/schedule/jobs').then(r => r.json()),
-        fetch('http://localhost:8000/api/v1/detection/stats').then(r => r.json())
+        fetch('/api/v1/alerts/config/status').then(r => r.json()),
+        fetch('/api/v1/detection/schedule/jobs').then(r => r.json()),
+        fetch('/api/v1/detection/stats').then(r => r.json())
       ]);
 
       setStats({
@@ -71,7 +71,7 @@ export function DashboardOverview() {
   const runQuickAnalysis = async () => {
     setAnalyzing(true);
     try {
-      const response = await fetch('http://localhost:8000/api/v1/detection/analyze/quick?hours=24&limit=50');
+      const response = await fetch('/api/v1/detection/analyze/quick?hours=24&limit=50');
       const data = await response.json();
 
       setStats(prev => prev ? {

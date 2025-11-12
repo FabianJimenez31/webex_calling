@@ -285,7 +285,7 @@ class CDRService:
             'Direction': cdr.direction,
             'Call type': cdr.call_type,
             'Answered': 'true' if cdr.answered else 'false',
-            'User type': cdr.user_type,
+            'User type': cdr.calling_user_type,
             'User': cdr.user,
             'Site UUID': cdr.site_uuid,
             'Site': cdr.site_name,

@@ -32,7 +32,7 @@ export function StaffingRecommendations() {
   const loadStaffingData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/analytics/staffing/recommendations?hours=${hours}&limit=5000`);
+      const response = await fetch(`/api/v1/analytics/staffing/recommendations?hours=${hours}&limit=5000`);
       const data = await response.json();
       setStaffingData(data);
     } catch (error) {

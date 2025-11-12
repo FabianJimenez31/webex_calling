@@ -42,7 +42,7 @@ export function SecurityDashboard() {
   const runSecurityScan = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/analytics/security/scan?hours=${hours}&limit=1000`);
+      const response = await fetch(`/api/v1/analytics/security/scan?hours=${hours}&limit=1000`);
       const data = await response.json();
       setScanResult(data);
     } catch (error) {

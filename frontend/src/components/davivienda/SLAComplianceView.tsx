@@ -33,7 +33,7 @@ export function SLAComplianceView() {
   const loadSLAData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/analytics/sla/compliance?hours=${hours}&limit=1000`);
+      const response = await fetch(`/api/v1/analytics/sla/compliance?hours=${hours}&limit=1000`);
       const data = await response.json();
       setSlaData(data);
     } catch (error) {

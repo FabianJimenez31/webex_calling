@@ -70,7 +70,7 @@ export function ChatAssistant() {
   // Load examples
   const loadExamples = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/chat/examples');
+      const response = await fetch('/api/v1/chat/examples');
       const data = await response.json();
 
       const examplesList: ExampleCategory[] = Object.entries(data.categories).map(
@@ -101,7 +101,7 @@ export function ChatAssistant() {
       // Show thinking animation for 2 seconds minimum
       const startTime = Date.now();
 
-      const response = await fetch('http://localhost:8000/api/v1/chat/ask', {
+      const response = await fetch('/api/v1/chat/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ export function ChatAssistant() {
 
   const downloadChatReport = async (questionText: string, answerData: any) => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/reports/chat/pdf', {
+      const response = await fetch('/api/v1/reports/chat/pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ export function ChatAssistant() {
                   <div className="text-sm font-medium mb-1">
                     {msg.role === 'user' ? 'Tú' : 'Asistente IA'}
                   </div>
-                  <div className="text-sm whitespace-pre-wrap">
+                  <div className="text-sm whitespace-pre-wrap leading-relaxed">
                     {msg.isTyping ? (
                       <TypewriterText
                         text={msg.content}
@@ -302,11 +302,14 @@ export function ChatAssistant() {
                   </div>
 
                   {msg.details && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 space-y-3">
                       {/* Key Metrics */}
                       {msg.details.key_metrics && (
-                        <div className="bg-white/50 p-3 rounded text-xs">
-                          <div className="font-semibold mb-2 text-davivienda-red">📊 Métricas Clave</div>
+                        <div className="bg-gradient-to-br from-white to-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+                          <div className="font-bold mb-3 text-davivienda-red flex items-center gap-2 text-sm">
+                            <span className="text-lg">📊</span>
+                            <span>Métricas Clave</span>
+                          </div>
                           <div className="space-y-2">
                             {Object.entries(msg.details.key_metrics).map(([key, value]) => {
                               // Check if value is an array of objects (like top_agents)
@@ -347,9 +350,9 @@ export function ChatAssistant() {
                               }
                               // Regular key-value pairs
                               return (
-                                <div key={key} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
-                                  <span className="text-gray-600 capitalize">{key.replace(/_/g, ' ')}:</span>
-                                  <span className="font-semibold text-gray-900">
+                                <div key={key} className="flex justify-between items-center py-2 px-3 bg-white rounded-md hover:bg-gray-50 transition-colors">
+                                  <span className="text-gray-700 capitalize text-xs font-medium">{key.replace(/_/g, ' ')}:</span>
+                                  <span className="font-bold text-gray-900 text-sm">
                                     {typeof value === 'number' && value % 1 !== 0
                                       ? value.toFixed(2)
                                       : String(value)}
@@ -363,15 +366,16 @@ export function ChatAssistant() {
 
                       {/* Insights */}
                       {msg.details.insights && msg.details.insights.length > 0 && (
-                        <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded text-xs">
-                          <div className="font-semibold mb-2 text-blue-800 flex items-center gap-1">
-                            💡 Observaciones
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                          <div className="font-bold mb-3 text-blue-900 flex items-center gap-2 text-sm">
+                            <span className="text-lg">💡</span>
+                            <span>Observaciones y Análisis</span>
                           </div>
-                          <ul className="space-y-1.5">
+                          <ul className="space-y-2.5">
                             {msg.details.insights.map((insight: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2">
-                                <span className="text-blue-600 mt-0.5">•</span>
-                                <span className="text-gray-700">{insight}</span>
+                              <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md">
+                                <span className="text-blue-600 font-bold mt-0.5 min-w-[20px]">{i + 1}.</span>
+                                <span className="text-gray-800 text-xs leading-relaxed">{insight}</span>
                               </li>
                             ))}
                           </ul>
@@ -380,15 +384,16 @@ export function ChatAssistant() {
 
                       {/* Recommendations */}
                       {msg.details.recommendations && msg.details.recommendations.length > 0 && (
-                        <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded text-xs">
-                          <div className="font-semibold mb-2 text-green-800 flex items-center gap-1">
-                            ✅ Recomendaciones
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-100/50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
+                          <div className="font-bold mb-3 text-green-900 flex items-center gap-2 text-sm">
+                            <span className="text-lg">✅</span>
+                            <span>Recomendaciones Estratégicas</span>
                           </div>
-                          <ul className="space-y-1.5">
+                          <ul className="space-y-2.5">
                             {msg.details.recommendations.map((rec: string, i: number) => (
-                              <li key={i} className="flex items-start gap-2">
-                                <span className="text-green-600 mt-0.5">→</span>
-                                <span className="text-gray-700">{rec}</span>
+                              <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md hover:bg-white/80 transition-colors">
+                                <span className="text-green-600 font-bold mt-0.5 min-w-[20px]">→</span>
+                                <span className="text-gray-800 text-xs leading-relaxed">{rec}</span>
                               </li>
                             ))}
                           </ul>

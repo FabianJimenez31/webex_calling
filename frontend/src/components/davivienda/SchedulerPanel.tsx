@@ -47,7 +47,7 @@ export function SchedulerPanel() {
 
   const loadStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/detection/schedule/jobs');
+      const response = await fetch('/api/v1/detection/schedule/jobs');
       const data = await response.json();
       setStatus(data);
     } catch (error) {
@@ -57,7 +57,7 @@ export function SchedulerPanel() {
 
   const loadHistory = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/detection/schedule/history?limit=20');
+      const response = await fetch('/api/v1/detection/schedule/history?limit=20');
       const data = await response.json();
       setHistory(data.analyses);
       setShowHistory(true);
@@ -82,7 +82,7 @@ export function SchedulerPanel() {
         config.interval_minutes = customInterval;
       }
 
-      const response = await fetch('http://localhost:8000/api/v1/detection/schedule/enable', {
+      const response = await fetch('/api/v1/detection/schedule/enable', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export function SchedulerPanel() {
 
   const disableJob = async (jobId: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/detection/schedule/disable/${jobId}`, {
+      const response = await fetch(`/api/v1/detection/schedule/disable/${jobId}`, {
         method: 'POST',
       });
 

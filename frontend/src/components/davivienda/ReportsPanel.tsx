@@ -14,7 +14,7 @@ export function ReportsPanel() {
     setLoading('security-pdf');
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/reports/security/pdf?hours=${hours}&limit=${limit}`
+        `/api/v1/reports/security/pdf?hours=${hours}&limit=${limit}`
       );
 
       if (!response.ok) throw new Error('Failed to generate report');
@@ -40,7 +40,7 @@ export function ReportsPanel() {
     setLoading('security-csv');
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/reports/security/csv?hours=${hours}&limit=${limit}`
+        `/api/v1/reports/security/csv?hours=${hours}&limit=${limit}`
       );
 
       if (!response.ok) throw new Error('Failed to generate report');
@@ -66,7 +66,7 @@ export function ReportsPanel() {
     setLoading('cdrs-csv');
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/reports/cdrs/csv?hours=${hours}&limit=${limit * 2}`
+        `/api/v1/reports/cdrs/csv?hours=${hours}&limit=${limit * 2}`
       );
 
       if (!response.ok) throw new Error('Failed to generate report');
