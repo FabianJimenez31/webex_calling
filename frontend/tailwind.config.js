@@ -109,7 +109,7 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Davivienda', 'Manrope', 'sans-serif'],
+        sans: ['Comfortaa', 'sans-serif'],
       },
       fontSize: {
         'h1': ['56px', { lineHeight: '73px', fontWeight: '700' }],
@@ -157,12 +157,57 @@ module.exports = {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(100%)" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "confetti": {
+          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
+          "100%": { transform: "translateY(100vh) rotate(720deg)", opacity: "0" },
+        },
+        "glow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
+        },
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "scale-pulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "rotate-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "slide-in": "slide-in-from-right 0.3s ease-out",
         "slide-out": "slide-out-to-right 0.3s ease-out",
+        "shimmer": "shimmer 3s linear infinite",
+        "float": "float 6s ease-in-out infinite",
+        "confetti": "confetti 3s ease-out forwards",
+        "glow": "glow 2s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 3s ease-in-out infinite",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "scale-pulse": "scale-pulse 2s ease-in-out infinite",
+        "gradient-shift": "gradient-shift 3s ease infinite",
+        "rotate-slow": "rotate-slow 8s linear infinite",
       },
     },
   },

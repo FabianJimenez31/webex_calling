@@ -2,6 +2,7 @@
 from .cdr import CallDetailRecord, CallJourney
 from .user import User
 from .alert import Alert, AlertType, AlertSeverity
+from .recording import Recording, ProcessingStatus, RecordingType
 from .base import Base
 
 __all__ = [
@@ -12,4 +13,7 @@ __all__ = [
     "Alert",
     "AlertType",
     "AlertSeverity",
+    "Recording",
+    "ProcessingStatus",
+    "RecordingType",
 ]

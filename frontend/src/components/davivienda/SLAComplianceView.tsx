@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
+import { AIBorder } from '../ui/ai-border';
+import { AILoadingModal } from '../ui/ai-loading-modal';
 import { CheckCircle, XCircle, AlertCircle, TrendingUp, Clock, Users, Loader2, RefreshCw } from 'lucide-react';
 
 interface SLAMetric {
@@ -25,6 +27,7 @@ export function SLAComplianceView() {
   const [slaData, setSlaData] = useState<SLAComplianceData | null>(null);
   const [loading, setLoading] = useState(false);
   const [hours, setHours] = useState(24);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     loadSLAData();
@@ -32,12 +35,26 @@ export function SLAComplianceView() {
 
   const loadSLAData = async () => {
     setLoading(true);
+    setShowAIModal(true); // Show AI loading modal
     try {
+      const startTime = Date.now();
+
       const response = await fetch(`/api/v1/analytics/sla/compliance?hours=${hours}&limit=1000`);
       const data = await response.json();
+
+      // Ensure modal shows for at least 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+
       setSlaData(data);
+      setShowAIModal(false); // Hide modal
+
+      // Scroll to top after loading data
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error loading SLA data:', error);
+      setShowAIModal(false); // Hide modal on error
     } finally {
       setLoading(false);
     }
@@ -85,6 +102,12 @@ export function SLAComplianceView() {
 
   return (
     <div className="space-y-6">
+      {/* AI Loading Modal */}
+      <AILoadingModal
+        isOpen={showAIModal}
+        message="Analizando cumplimiento de SLA con IA..."
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -386,35 +409,37 @@ export function SLAComplianceView() {
           </Card>
 
           {/* Recommendations */}
-          <Card className="border-l-4 border-l-davivienda-red">
-            <CardHeader>
-              <CardTitle className="text-base">💡 Recomendaciones</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                {!slaData.answer_rate.compliant && (
-                  <div className="p-3 bg-red-50 rounded border border-red-200 text-red-800">
-                    <strong>⚠️ Answer Rate Bajo:</strong> Considere aumentar el personal o revisar los procesos de routing de llamadas.
-                  </div>
-                )}
-                {!slaData.avg_handle_time.compliant && (
-                  <div className="p-3 bg-yellow-50 rounded border border-yellow-200 text-yellow-800">
-                    <strong>⏱️ Handle Time Alto:</strong> Revisar scripts de agentes y capacitación para mejorar eficiencia.
-                  </div>
-                )}
-                {!slaData.team_compliance.compliant && (
-                  <div className="p-3 bg-orange-50 rounded border border-orange-200 text-orange-800">
-                    <strong>👥 Team Compliance Bajo:</strong> Identificar agentes con bajo rendimiento y proporcionar coaching.
-                  </div>
-                )}
-                {slaData.overall_score >= 80 && (
-                  <div className="p-3 bg-green-50 rounded border border-green-200 text-green-800">
-                    <strong>✅ Excelente Desempeño:</strong> El equipo está cumpliendo con todos los objetivos de SLA. Mantener estas prácticas.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <AIBorder borderWidth={3}>
+            <Card className="border-l-4 border-l-davivienda-red">
+              <CardHeader>
+                <CardTitle className="text-base">💡 Recomendaciones IA</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm">
+                  {!slaData.answer_rate.compliant && (
+                    <div className="p-3 bg-red-50 rounded border border-red-200 text-red-800">
+                      <strong>⚠️ Answer Rate Bajo:</strong> Considere aumentar el personal o revisar los procesos de routing de llamadas.
+                    </div>
+                  )}
+                  {!slaData.avg_handle_time.compliant && (
+                    <div className="p-3 bg-yellow-50 rounded border border-yellow-200 text-yellow-800">
+                      <strong>⏱️ Handle Time Alto:</strong> Revisar scripts de agentes y capacitación para mejorar eficiencia.
+                    </div>
+                  )}
+                  {!slaData.team_compliance.compliant && (
+                    <div className="p-3 bg-orange-50 rounded border border-orange-200 text-orange-800">
+                      <strong>👥 Team Compliance Bajo:</strong> Identificar agentes con bajo rendimiento y proporcionar coaching.
+                    </div>
+                  )}
+                  {slaData.overall_score >= 80 && (
+                    <div className="p-3 bg-green-50 rounded border border-green-200 text-green-800">
+                      <strong>✅ Excelente Desempeño:</strong> El equipo está cumpliendo con todos los objetivos de SLA. Mantener estas prácticas.
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </AIBorder>
         </>
       )}
     </div>

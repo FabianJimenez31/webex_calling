@@ -40,7 +40,12 @@ async def login():
 
 
 @router.get("/callback")
-async def oauth_callback(code: str, state: str = None):
+async def oauth_callback(
+    code: Optional[str] = None,
+    state: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None
+):
     """
     OAuth callback endpoint
     Exchanges the authorization code for access token
@@ -48,7 +53,111 @@ async def oauth_callback(code: str, state: str = None):
     Args:
         code: Authorization code from Webex
         state: State parameter for CSRF protection
+        error: Error code if authorization failed
+        error_description: Description of the error
     """
+    # Handle OAuth errors from Webex
+    if error:
+        logger.error(f"OAuth error: {error} - {error_description}")
+        error_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Autenticación Fallida</title>
+            <style>
+                body {{
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #E30519 0%, #A80313 100%);
+                }}
+                .container {{
+                    background: white;
+                    padding: 40px;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                    max-width: 600px;
+                    text-align: center;
+                }}
+                h1 {{
+                    color: #E30519;
+                    margin-bottom: 20px;
+                }}
+                .error-icon {{
+                    font-size: 64px;
+                    margin-bottom: 20px;
+                }}
+                .error-box {{
+                    background: #FEE2E2;
+                    border: 2px solid #EF4444;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin: 20px 0;
+                }}
+                .button {{
+                    display: inline-block;
+                    margin-top: 20px;
+                    padding: 12px 24px;
+                    background: #E30519;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: bold;
+                }}
+                .button:hover {{
+                    background: #C70416;
+                }}
+                .instructions {{
+                    background: #F3F4F6;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-top: 20px;
+                    text-align: left;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="error-icon">❌</div>
+                <h1>Error de Autenticación</h1>
+
+                <div class="error-box">
+                    <p><strong>Error:</strong> {error}</p>
+                    <p><strong>Descripción:</strong> {error_description or 'Unknown error'}</p>
+                </div>
+
+                <div class="instructions">
+                    <h3>🔧 Cómo solucionar este problema:</h3>
+                    <ol style="text-align: left;">
+                        <li>Ve a <a href="https://developer.webex.com/my-apps" target="_blank">Webex Developer Portal</a></li>
+                        <li>Edita tu integración</li>
+                        <li>En la sección <strong>Scopes</strong>, asegúrate de seleccionar:
+                            <ul>
+                                <li>☑️ analytics:read_all</li>
+                                <li>☑️ spark:organizations_read</li>
+                                <li>☑️ spark:people_read</li>
+                            </ul>
+                        </li>
+                        <li>Verifica que el <strong>Redirect URI</strong> sea:<br/>
+                            <code>https://webex.r0bot.ai/auth/callback</code>
+                        </li>
+                        <li>Guarda los cambios e intenta de nuevo</li>
+                    </ol>
+                </div>
+
+                <a href="https://webex.r0bot.ai" class="button">Volver al Dashboard</a>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=error_html, status_code=400)
+
+    if not code:
+        raise HTTPException(status_code=400, detail="No authorization code provided")
+
     try:
         logger.info(f"Received OAuth callback with code")
 
@@ -127,7 +236,7 @@ async def oauth_callback(code: str, state: str = None):
                     <p><strong>Scopes:</strong> {token_data.get('scope', 'N/A')}</p>
                 </div>
 
-                <a href="http://localhost:5173" class="button">Ir al Dashboard →</a>
+                <a href="https://webex.r0bot.ai" class="button">Ir al Dashboard →</a>
             </div>
         </body>
         </html>

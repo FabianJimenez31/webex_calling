@@ -1,5 +1,5 @@
-/* Import Davivienda-like fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+/* Import Comfortaa from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -99,7 +99,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Davivienda', 'Manrope', sans-serif;
+    font-family: 'Comfortaa', sans-serif;
   }
 
   /* Typography defaults */
@@ -253,4 +253,24 @@
 ::selection {
   background: hsl(var(--davivienda-red) / 0.3);
   color: hsl(var(--foreground));
+}
+
+/* AI Animation - Apple Intelligence style */
+@property --gradient-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-gradient {
+  from {
+    --gradient-angle: 0deg;
+  }
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+.animate-border-gradient {
+  animation: rotate-gradient 3s linear infinite;
 }

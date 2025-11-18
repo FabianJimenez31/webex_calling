@@ -14,6 +14,7 @@ from src.services.webex_client import webex_client
 from src.services.anomaly_detector import anomaly_detector
 from src.services.chat_assistant import chat_assistant
 from src.services.report_generator import report_generator
+from src.services.cdr_service import cdr_service
 
 logger = logging.getLogger(__name__)
 
@@ -38,15 +39,8 @@ async def export_security_pdf(
     try:
         logger.info(f"Generating security PDF report for last {hours} hours...")
 
-        # Fetch CDRs
-        end_time = datetime.utcnow() - timedelta(minutes=5)
-        start_time = end_time - timedelta(hours=hours)
-
-        cdrs = await webex_client.get_cdrs(
-            start_time=start_time,
-            end_time=end_time,
-            limit=limit
-        )
+        # Fetch CDRs from local database
+        cdrs = await cdr_service.get_cdrs_from_db(hours=hours, limit=limit)
 
         if not cdrs:
             raise HTTPException(status_code=404, detail="No CDR data available")
@@ -92,15 +86,8 @@ async def export_security_csv(
     try:
         logger.info(f"Generating security CSV report...")
 
-        # Fetch CDRs
-        end_time = datetime.utcnow() - timedelta(minutes=5)
-        start_time = end_time - timedelta(hours=hours)
-
-        cdrs = await webex_client.get_cdrs(
-            start_time=start_time,
-            end_time=end_time,
-            limit=limit
-        )
+        # Fetch CDRs from local database
+        cdrs = await cdr_service.get_cdrs_from_db(hours=hours, limit=limit)
 
         if not cdrs:
             raise HTTPException(status_code=404, detail="No CDR data available")
@@ -147,15 +134,8 @@ async def export_cdrs_csv(
     try:
         logger.info(f"Exporting CDRs to CSV...")
 
-        # Fetch CDRs
-        end_time = datetime.utcnow() - timedelta(minutes=5)
-        start_time = end_time - timedelta(hours=hours)
-
-        cdrs = await webex_client.get_cdrs(
-            start_time=start_time,
-            end_time=end_time,
-            limit=limit
-        )
+        # Fetch CDRs from local database
+        cdrs = await cdr_service.get_cdrs_from_db(hours=hours, limit=limit)
 
         if not cdrs:
             raise HTTPException(status_code=404, detail="No CDR data available")
@@ -199,15 +179,8 @@ async def export_chat_pdf(request: ChatReportRequest):
     try:
         logger.info(f"Generating chat PDF report for: {request.question}")
 
-        # Fetch CDRs
-        end_time = datetime.utcnow() - timedelta(minutes=5)
-        start_time = end_time - timedelta(hours=request.hours)
-
-        cdrs = await webex_client.get_cdrs(
-            start_time=start_time,
-            end_time=end_time,
-            limit=request.limit
-        )
+        # Fetch CDRs from local database
+        cdrs = await cdr_service.get_cdrs_from_db(hours=request.hours, limit=request.limit)
 
         if not cdrs:
             raise HTTPException(status_code=404, detail="No CDR data available")

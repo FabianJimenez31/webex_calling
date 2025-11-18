@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
+import { AIBorder } from '../ui/ai-border';
+import { AILoadingModal } from '../ui/ai-loading-modal';
 import { Users, TrendingUp, Phone, Clock, Award, CheckCircle, XCircle, Loader2, RefreshCw } from 'lucide-react';
 
 interface AgentMetrics {
@@ -46,6 +48,7 @@ export function AgentPerformanceDashboard() {
   const [performanceData, setPerformanceData] = useState<PerformanceResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [hours, setHours] = useState(24);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     loadPerformanceData();
@@ -53,12 +56,26 @@ export function AgentPerformanceDashboard() {
 
   const loadPerformanceData = async () => {
     setLoading(true);
+    setShowAIModal(true); // Show AI loading modal
     try {
+      const startTime = Date.now();
+
       const response = await fetch(`/api/v1/analytics/agents/performance?hours=${hours}&limit=1000`);
       const data = await response.json();
+
+      // Ensure modal shows for at least 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+
       setPerformanceData(data);
+      setShowAIModal(false); // Hide modal
+
+      // Scroll to top after loading data
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error loading performance data:', error);
+      setShowAIModal(false); // Hide modal on error
     } finally {
       setLoading(false);
     }
@@ -96,6 +113,12 @@ export function AgentPerformanceDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* AI Loading Modal */}
+      <AILoadingModal
+        isOpen={showAIModal}
+        message="Analizando performance de agentes con IA..."
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -239,21 +262,23 @@ export function AgentPerformanceDashboard() {
 
           {/* Insights */}
           {performanceData.insights.length > 0 && (
-            <Card className="border-l-4 border-l-blue-500">
-              <CardHeader>
-                <CardTitle className="text-base">💡 Observaciones Clave</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {performanceData.insights.map((insight, idx) => (
-                    <div key={idx} className="flex items-start gap-2 p-2 bg-blue-50 rounded text-sm">
-                      <span className="text-blue-600 mt-0.5">•</span>
-                      <span className="text-gray-700">{insight}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <AIBorder borderWidth={3}>
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader>
+                  <CardTitle className="text-base">💡 Observaciones Clave IA</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {performanceData.insights.map((insight, idx) => (
+                      <div key={idx} className="flex items-start gap-2 p-2 bg-blue-50 rounded text-sm">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span className="text-gray-700">{insight}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </AIBorder>
           )}
 
           {/* Top Performers Table */}

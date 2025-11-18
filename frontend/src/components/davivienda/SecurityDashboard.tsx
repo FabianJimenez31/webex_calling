@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
+import { AIBorder } from '../ui/ai-border';
+import { AILoadingModal } from '../ui/ai-loading-modal';
 import { Shield, AlertTriangle, Clock, Phone, Loader2, RefreshCw, AlertCircle } from 'lucide-react';
 
 interface SecurityAlert {
@@ -34,6 +36,7 @@ export function SecurityDashboard() {
   const [scanResult, setScanResult] = useState<SecurityScanResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [hours, setHours] = useState(24);
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     runSecurityScan();
@@ -41,12 +44,26 @@ export function SecurityDashboard() {
 
   const runSecurityScan = async () => {
     setLoading(true);
+    setShowAIModal(true); // Show AI loading modal
     try {
+      const startTime = Date.now();
+
       const response = await fetch(`/api/v1/analytics/security/scan?hours=${hours}&limit=1000`);
       const data = await response.json();
+
+      // Ensure modal shows for at least 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+
       setScanResult(data);
+      setShowAIModal(false); // Hide modal
+
+      // Scroll to top after loading data
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error running security scan:', error);
+      setShowAIModal(false); // Hide modal on error
     } finally {
       setLoading(false);
     }
@@ -123,6 +140,12 @@ export function SecurityDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* AI Loading Modal */}
+      <AILoadingModal
+        isOpen={showAIModal}
+        message="Analizando seguridad con IA..."
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -310,10 +333,12 @@ export function SecurityDashboard() {
                           </div>
 
                           {/* Recommended Action */}
-                          <div className="bg-white rounded p-2 border border-gray-200">
-                            <p className="text-xs font-semibold text-gray-700 mb-1">📋 Acción Recomendada:</p>
-                            <p className="text-xs text-gray-600">{alert.recommended_action}</p>
-                          </div>
+                          <AIBorder borderWidth={2}>
+                            <div className="bg-white rounded p-2 border border-gray-200">
+                              <p className="text-xs font-semibold text-gray-700 mb-1">📋 Acción Recomendada IA:</p>
+                              <p className="text-xs text-gray-600">{alert.recommended_action}</p>
+                            </div>
+                          </AIBorder>
 
                           {/* Timestamp */}
                           <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">

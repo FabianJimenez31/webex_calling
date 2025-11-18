@@ -84,7 +84,7 @@ async def health_check():
 
 
 # Include routers
-from src.api.routes import alerts, auth, cdrs, analytics, detection, chat, reports
+from src.api.routes import alerts, auth, cdrs, analytics, detection, chat, reports, recordings, ai
 
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(cdrs.router, prefix="/api/v1/cdrs", tags=["CDRs"])
@@ -92,7 +92,9 @@ app.include_router(alerts.router, prefix="/api/v1/alerts", tags=["Alerts"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
 app.include_router(detection.router, prefix="/api/v1/detection", tags=["Detection"])
 app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat Assistant"])
+app.include_router(ai.router, prefix="/api/v1/ai", tags=["AI Modules"])
 app.include_router(reports.router, prefix="/api/v1/reports", tags=["Reports"])
+app.include_router(recordings.router, prefix="/api/v1/recordings", tags=["Recordings"])
 # app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 
 

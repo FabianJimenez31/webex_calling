@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     # Claude AI Configuration
     anthropic_api_key: str = ""
 
+    # OpenAI Configuration (for Whisper transcription)
+    openai_api_key: str = ""
+
     # OpenRouter AI Configuration
     openrouter_api_key: str
     openrouter_model: str = "openai/gpt-oss-safeguard-20b"

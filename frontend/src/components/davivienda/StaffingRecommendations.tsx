@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
+import { AIBorder } from '../ui/ai-border';
+import { AILoadingModal } from '../ui/ai-loading-modal';
 import { Users, TrendingUp, Clock, AlertTriangle, Loader2, RefreshCw, Calendar } from 'lucide-react';
 
 interface StaffingRecommendation {
@@ -24,6 +26,7 @@ export function StaffingRecommendations() {
   const [staffingData, setStaffingData] = useState<StaffingData | null>(null);
   const [loading, setLoading] = useState(false);
   const [hours, setHours] = useState(168); // Default 7 days
+  const [showAIModal, setShowAIModal] = useState(false);
 
   useEffect(() => {
     loadStaffingData();
@@ -31,12 +34,26 @@ export function StaffingRecommendations() {
 
   const loadStaffingData = async () => {
     setLoading(true);
+    setShowAIModal(true); // Show AI loading modal
     try {
+      const startTime = Date.now();
+
       const response = await fetch(`/api/v1/analytics/staffing/recommendations?hours=${hours}&limit=5000`);
       const data = await response.json();
+
+      // Ensure modal shows for at least 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+
       setStaffingData(data);
+      setShowAIModal(false); // Hide modal
+
+      // Scroll to top after loading data
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error loading staffing data:', error);
+      setShowAIModal(false); // Hide modal on error
     } finally {
       setLoading(false);
     }
@@ -82,6 +99,12 @@ export function StaffingRecommendations() {
 
   return (
     <div className="space-y-6">
+      {/* AI Loading Modal */}
+      <AILoadingModal
+        isOpen={showAIModal}
+        message="Generando recomendaciones de staffing con IA..."
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -193,17 +216,19 @@ export function StaffingRecommendations() {
           </div>
 
           {/* Summary Alert */}
-          <Card className="border-l-4 border-l-blue-500 bg-blue-50">
-            <CardContent className="pt-4">
-              <div className="flex items-start gap-3">
-                <TrendingUp className="h-5 w-5 text-blue-600 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-blue-900 mb-1">Resumen del Análisis</h3>
-                  <p className="text-sm text-blue-800">{staffingData.summary}</p>
+          <AIBorder borderWidth={3}>
+            <Card className="border-l-4 border-l-blue-500 bg-blue-50">
+              <CardContent className="pt-4">
+                <div className="flex items-start gap-3">
+                  <TrendingUp className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-1">Resumen del Análisis IA</h3>
+                    <p className="text-sm text-blue-800">{staffingData.summary}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </AIBorder>
 
           {/* Visual Call Volume Chart */}
           <Card>
@@ -266,42 +291,44 @@ export function StaffingRecommendations() {
 
           {/* Peak Hours Detail */}
           {staffingData.peak_hours.length > 0 && (
-            <Card className="border-2 border-red-200">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Horas Pico - Prioridad Alta
-                </CardTitle>
-                <CardDescription>
-                  Estas horas requieren mayor cobertura de personal
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {staffingData.peak_hours.map((rec, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 bg-red-50 border border-red-200 rounded-lg"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-bold text-red-900">{rec.hour_label}</div>
-                        <span className="text-2xl">{getPriorityBadge(rec.priority)}</span>
-                      </div>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Volumen:</span>
-                          <span className="font-semibold text-red-700">{rec.call_volume} llamadas</span>
+            <AIBorder borderWidth={3}>
+              <Card className="border-2 border-red-200">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                    Horas Pico - Prioridad Alta (Recomendación IA)
+                  </CardTitle>
+                  <CardDescription>
+                    Estas horas requieren mayor cobertura de personal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {staffingData.peak_hours.map((rec, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 bg-red-50 border border-red-200 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-bold text-red-900">{rec.hour_label}</div>
+                          <span className="text-2xl">{getPriorityBadge(rec.priority)}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Agentes necesarios:</span>
-                          <span className="font-semibold text-red-700">{rec.recommended_agents}</span>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Volumen:</span>
+                            <span className="font-semibold text-red-700">{rec.call_volume} llamadas</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Agentes necesarios:</span>
+                            <span className="font-semibold text-red-700">{rec.recommended_agents}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </AIBorder>
           )}
 
           {/* Detailed Recommendations Table */}

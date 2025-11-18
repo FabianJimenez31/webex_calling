@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { AIBorder } from '../ui/ai-border';
+import { AILoadingModal } from '../ui/ai-loading-modal';
 import { Loader2, Send, Sparkles, Download, Info, Brain } from 'lucide-react';
 
 interface ChatMessage {
@@ -65,6 +67,7 @@ export function ChatAssistant() {
   const [isThinking, setIsThinking] = useState(false);
   const [examples, setExamples] = useState<ExampleCategory[]>([]);
   const [showExamples, setShowExamples] = useState(false);
+  const [showAIModal, setShowAIModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load examples
@@ -96,9 +99,10 @@ export function ChatAssistant() {
     setMessage('');
     setLoading(true);
     setIsThinking(true);
+    setShowAIModal(true); // Show AI loading modal
 
     try {
-      // Show thinking animation for 2 seconds minimum
+      // Show modal for 3 seconds minimum
       const startTime = Date.now();
 
       const response = await fetch('/api/v1/chat/ask', {
@@ -119,12 +123,13 @@ export function ChatAssistant() {
 
       const data = await response.json();
 
-      // Ensure thinking animation shows for at least 2 seconds
+      // Ensure modal shows for at least 3 seconds
       const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 2000 - elapsedTime);
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
 
       await new Promise(resolve => setTimeout(resolve, remainingTime));
 
+      setShowAIModal(false); // Hide modal
       setIsThinking(false);
 
       // Add assistant response with typing effect
@@ -137,6 +142,7 @@ export function ChatAssistant() {
       }]);
     } catch (error) {
       console.error('Error:', error);
+      setShowAIModal(false); // Hide modal on error
       setIsThinking(false);
 
       let errorMessage = 'No se pudo procesar la pregunta. Por favor intenta de nuevo.';
@@ -196,6 +202,12 @@ export function ChatAssistant() {
 
   return (
     <div className="space-y-4">
+      {/* AI Loading Modal */}
+      <AILoadingModal
+        isOpen={showAIModal}
+        message="Analizando tus datos con IA..."
+      />
+
       <Card className="border-l-4 border-l-davivienda-red">
         <CardHeader className="bg-gradient-to-r from-gray-50 to-white">
           <div className="flex items-center justify-between">
@@ -366,38 +378,42 @@ export function ChatAssistant() {
 
                       {/* Insights */}
                       {msg.details.insights && msg.details.insights.length > 0 && (
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
-                          <div className="font-bold mb-3 text-blue-900 flex items-center gap-2 text-sm">
-                            <span className="text-lg">💡</span>
-                            <span>Observaciones y Análisis</span>
+                        <AIBorder borderWidth={3}>
+                          <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                            <div className="font-bold mb-3 text-blue-900 flex items-center gap-2 text-sm">
+                              <span className="text-lg">💡</span>
+                              <span>Observaciones y Análisis IA</span>
+                            </div>
+                            <ul className="space-y-2.5">
+                              {msg.details.insights.map((insight: string, i: number) => (
+                                <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md">
+                                  <span className="text-blue-600 font-bold mt-0.5 min-w-[20px]">{i + 1}.</span>
+                                  <span className="text-gray-800 text-xs leading-relaxed">{insight}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                          <ul className="space-y-2.5">
-                            {msg.details.insights.map((insight: string, i: number) => (
-                              <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md">
-                                <span className="text-blue-600 font-bold mt-0.5 min-w-[20px]">{i + 1}.</span>
-                                <span className="text-gray-800 text-xs leading-relaxed">{insight}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        </AIBorder>
                       )}
 
                       {/* Recommendations */}
                       {msg.details.recommendations && msg.details.recommendations.length > 0 && (
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-100/50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
-                          <div className="font-bold mb-3 text-green-900 flex items-center gap-2 text-sm">
-                            <span className="text-lg">✅</span>
-                            <span>Recomendaciones Estratégicas</span>
+                        <AIBorder borderWidth={3}>
+                          <div className="bg-gradient-to-br from-green-50 to-emerald-100/50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm">
+                            <div className="font-bold mb-3 text-green-900 flex items-center gap-2 text-sm">
+                              <span className="text-lg">✅</span>
+                              <span>Recomendaciones Estratégicas IA</span>
+                            </div>
+                            <ul className="space-y-2.5">
+                              {msg.details.recommendations.map((rec: string, i: number) => (
+                                <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md hover:bg-white/80 transition-colors">
+                                  <span className="text-green-600 font-bold mt-0.5 min-w-[20px]">→</span>
+                                  <span className="text-gray-800 text-xs leading-relaxed">{rec}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                          <ul className="space-y-2.5">
-                            {msg.details.recommendations.map((rec: string, i: number) => (
-                              <li key={i} className="flex items-start gap-3 p-2 bg-white/60 rounded-md hover:bg-white/80 transition-colors">
-                                <span className="text-green-600 font-bold mt-0.5 min-w-[20px]">→</span>
-                                <span className="text-gray-800 text-xs leading-relaxed">{rec}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                        </AIBorder>
                       )}
 
                       {/* Download button for assistant messages */}

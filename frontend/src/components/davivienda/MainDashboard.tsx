@@ -75,9 +75,23 @@ export function MainDashboard() {
         console.warn('No data available:', summaryData.message);
         // Set empty data structure
         const emptyData: DashboardData = {
-          security: { risk_level: 'LOW', anomalies_detected: 0, critical_alerts: 0, top_alerts: [] },
-          performance: { avg_wait_time: 0, avg_handle_time: 0, service_level: 0, top_performers: [] },
-          sla: { compliance_rate: 0, breaches: 0, avg_response_time: 0 },
+          security: {
+            score: 0,
+            risk_level: 'LOW',
+            total_alerts: 0,
+            critical_alerts: 0
+          },
+          performance: {
+            total_agents: 0,
+            total_calls: 0,
+            answer_rate: 0,
+            avg_handle_time: 0,
+            avg_productivity: 0
+          },
+          sla: {
+            overall_score: 0,
+            status: 'N/A'
+          },
           recent_activity: [],
           call_trends: generateCallTrends(),
           agent_comparison: []
@@ -88,9 +102,23 @@ export function MainDashboard() {
 
       // Transform data for charts
       const transformedData: DashboardData = {
-        security: summaryData.security || { risk_level: 'LOW', anomalies_detected: 0, critical_alerts: 0, top_alerts: [] },
-        performance: summaryData.performance || { avg_wait_time: 0, avg_handle_time: 0, service_level: 0, top_performers: [] },
-        sla: summaryData.sla || { compliance_rate: 0, breaches: 0, avg_response_time: 0 },
+        security: {
+          score: summaryData.security?.score ?? 0,
+          risk_level: summaryData.security?.risk_level || 'LOW',
+          total_alerts: summaryData.security?.total_alerts ?? 0,
+          critical_alerts: summaryData.security?.critical_alerts ?? 0
+        },
+        performance: {
+          total_agents: summaryData.performance?.total_agents ?? 0,
+          total_calls: summaryData.performance?.total_calls ?? 0,
+          answer_rate: summaryData.performance?.answer_rate ?? 0,
+          avg_handle_time: summaryData.performance?.avg_handle_time ?? 0,
+          avg_productivity: summaryData.performance?.avg_productivity ?? 0
+        },
+        sla: {
+          overall_score: summaryData.sla?.overall_score ?? 0,
+          status: summaryData.sla?.status || 'N/A'
+        },
         recent_activity: summaryData.security?.top_alerts || [],
         call_trends: generateCallTrends(), // Mock data for now
         agent_comparison: summaryData.performance?.top_performers?.slice(0, 5) || []

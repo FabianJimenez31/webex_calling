@@ -4,7 +4,7 @@
  */
 import React, { useState } from 'react';
 import { MainDashboard } from './components/davivienda/MainDashboard';
-import { ChatAssistant } from './components/davivienda/ChatAssistant';
+import { WebexAIModule } from './components/davivienda/WebexAIModule';
 import { ReportsPanel } from './components/davivienda/ReportsPanel';
 import { AlertsPanel } from './components/davivienda/AlertsPanel';
 import { SchedulerPanel } from './components/davivienda/SchedulerPanel';
@@ -12,19 +12,22 @@ import { SecurityDashboard } from './components/davivienda/SecurityDashboard';
 import { AgentPerformanceDashboard } from './components/davivienda/AgentPerformanceDashboard';
 import { SLAComplianceView } from './components/davivienda/SLAComplianceView';
 import { StaffingRecommendations } from './components/davivienda/StaffingRecommendations';
+import { RecordingsManager } from './components/davivienda/RecordingsManager';
+import { AuthStatusBanner } from './components/davivienda/AuthStatusBanner';
 import {
   LayoutDashboard,
-  MessageSquare,
+  Sparkles,
   Shield,
   Download,
   Bell,
   Clock,
   Users,
   CheckCircle,
-  Calendar
+  Calendar,
+  FileAudio
 } from 'lucide-react';
 
-type TabType = 'dashboard' | 'chat' | 'security' | 'reports' | 'alerts' | 'scheduler' | 'fraud' | 'agents' | 'sla' | 'staffing';
+type TabType = 'dashboard' | 'ai' | 'security' | 'reports' | 'alerts' | 'scheduler' | 'fraud' | 'agents' | 'recordings' | 'sla' | 'staffing';
 
 interface Tab {
   id: TabType;
@@ -56,6 +59,12 @@ function App() {
       component: <AgentPerformanceDashboard />
     },
     {
+      id: 'recordings',
+      label: 'Grabaciones',
+      icon: <FileAudio className="h-4 w-4" />,
+      component: <RecordingsManager />
+    },
+    {
       id: 'sla',
       label: 'SLA Compliance',
       icon: <CheckCircle className="h-4 w-4" />,
@@ -68,10 +77,10 @@ function App() {
       component: <StaffingRecommendations />
     },
     {
-      id: 'chat',
-      label: 'Chat IA',
-      icon: <MessageSquare className="h-4 w-4" />,
-      component: <ChatAssistant />
+      id: 'ai',
+      label: 'Módulo IA Webex',
+      icon: <Sparkles className="h-4 w-4" />,
+      component: <WebexAIModule />
     },
     {
       id: 'reports',
@@ -147,6 +156,7 @@ function App() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-7xl mx-auto">
+          <AuthStatusBanner />
           {activeTabData?.component}
         </div>
       </main>
